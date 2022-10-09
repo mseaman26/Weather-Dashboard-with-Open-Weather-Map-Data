@@ -12,6 +12,11 @@ $(document).ready(function(){
     if(displayedCities ==null){
         displayedCities = []
     }
+    function toTitleCase(str) {
+        return str.replace(/\w\S*/g, function(txt){
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
     function clearWeatherDisplays(){
         document.getElementById("current-weather-div").innerHTML = ""
         document.getElementById("forecast-div").innerHTML = ""
@@ -45,7 +50,7 @@ $(document).ready(function(){
     }
     function displayDate(){
         dateH2 = document.createElement("h2")
-        dateH2.textContent = currentDate
+        dateH2.textContent = toTitleCase(currentCityInput)+" "+currentDate
         document.getElementById("current-weather-div").appendChild(dateH2)
     }
 
@@ -231,6 +236,7 @@ $(document).ready(function(){
 
                     }
                     function displayForecast(){
+                        console.log("weather", weather)
                         for(var i = 1; i < 6; i++){
                             var forcastDayDiv = document.createElement("div")
                             forcastDayDiv.setAttribute("id", "forecast-day-div"+i)
@@ -240,6 +246,22 @@ $(document).ready(function(){
                             var dateEL = document.createElement("h2")
                             dateEL.textContent = moment().add(i, "day").format("MM/D/YYYY")
                             document.getElementById("forecast-day-div"+i).appendChild(dateEL)
+
+                            var iconEL = document.createElement("img")
+                            iconEL.setAttribute("src", weather[i].icon)
+                            document.getElementById("forecast-day-div"+i).appendChild(iconEL)
+
+                            var tempEL = document.createElement("p")
+                            tempEL.textContent = "Temperature: "+(weather[i].temp)+"(f)"
+                            document.getElementById("forecast-day-div"+i).appendChild(tempEL)
+
+                            var windEl = document.createElement("p")
+                            windEl.textContent = "Wind: "+weather[i].wind+"mph"
+                            document.getElementById("forecast-day-div"+i).appendChild(windEl)
+
+                            var humidityEL = document.createElement("p")
+                            humidityEL.textContent = "Humidity: "+weather[i].humidity+"%"
+                            document.getElementById("forecast-day-div"+i).appendChild(humidityEL)
                         }
                     }
                     displayForecast()

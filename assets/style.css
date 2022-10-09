@@ -53,9 +53,10 @@ button{
     justify-content: space-evenly;
 }
 .forecast-day-div{
-    
     height: 288px;
     width: 250px;
     border: 2px solid black;
     margin: 10px;
+    background-color: rgb(48, 48, 97);
+    color: white;
 }
