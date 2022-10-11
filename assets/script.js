@@ -79,7 +79,7 @@ $(document).ready(function(){
     function createWeatherArray(){
         weather = []
         fetch("http://api.openweathermap.org/geo/1.0/direct?q="+currentCityInput+"&limit=5&appid="+apiKay)
-        //TODO: bad response handler needs work
+        //TODO: bad response handler needs work!
         .then(function (response) {
             if(!response.ok){
                 var notACityEl = document.createElement("h2")
