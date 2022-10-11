@@ -34,6 +34,11 @@ button{
     margin-top: 10px;
     border-radius: 4px;
 }
+.delete-button{
+    float: right;
+    width: fit-content;
+    background-color: red;
+}
 #weather-div{
     display: block;
 }
@@ -49,7 +54,7 @@ button{
 
 #forecast-div{
     display: flex;
-    height: 200px;
+   
     justify-content: space-evenly;
 }
 .forecast-day-div{
@@ -59,4 +64,24 @@ button{
     margin: 10px;
     background-color: rgb(48, 48, 97);
     color: white;
+}
+
+@media screen and (max-width: 992px) {
+    #forecast-div{
+        flex-wrap: wrap;
+       }
+    #forecast-div h2{
+        font-size: 20px;
+       }
+    
+    
+}
+
+@media screen and (max-width: 768px) {
+   #forecast-div{
+    flex-direction: column;
+   }
+    .city{
+        height: 54px;
+    }
 }

@@ -1,20 +1,29 @@
 $(document).ready(function(){
+
+    //these two links are just here for copying and pasting purposes if needed
     var CurrentWeatherMapURL = "https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}"
     var GeoCodingURL = "http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit={limit}&appid={API key}"
+    //this is the key to access openweathermaps api and the associated geo mapping api
     var apiKay = "9cfe7036b90b3a13af1a88f6bf534b32"
+    //where the list of previously added cities will be displayed
     var cityListDiv = document.getElementById("city-list-div")
+    //imprtant variable.  It is always used as the current city that we are displaying
     var currentCityInput
     var displayedCities = JSON.parse(localStorage.getItem("displayed-cities"))
     var currentDate = moment().format("MM/D/YYYY")
     //ar currentDate = moment().add(4, "day").format("MM/D/YYYY")
+
+    //this array will eventually be filled with objects representing data current weather and each day of the forecast
     var weather = []
     var currentData
     var forecastData
-
+    //initializing the list of previous cities
     if(displayedCities ==null){
         displayedCities = []
     }
   
+    //Function declarations begin here.  
+
     function clearWeatherDisplays(){
         document.getElementById("current-weather-div").innerHTML = ""
         document.getElementById("forecast-div").innerHTML = ""
@@ -27,6 +36,9 @@ $(document).ready(function(){
             cityListDiv.innerHTML = ""
             return
         }
+        if(displayedCities.includes(currentCityInput)){
+            return
+        }
         displayedCities.push(currentCityInput)
         localStorage.setItem("displayed-cities", JSON.stringify(displayedCities))
         cityListDiv.innerHTML = ""
@@ -37,6 +49,11 @@ $(document).ready(function(){
             city.setAttribute("class", "city")
             city.innerHTML = displayedCities[i]
             cityListDiv.appendChild(city)
+
+            // var deleteCityButton = document.createElement("button")
+            // deleteCityButton.setAttribute("class", "delete-button")
+            // deleteCityButton.textContent = "Remove City"
+            // city.appendChild(deleteCityButton)
         }
     }
     function clearCityList(){
@@ -46,18 +63,30 @@ $(document).ready(function(){
         localStorage.setItem("displayed-cities", JSON.stringify(displayedCities))
 
     }
+    function clearCityDisplay(){
+        document.getElementById("city-list-div").innerHTML = ""
+    }
     function displayDate(){
         dateH2 = document.createElement("h2")
         dateH2.textContent =(currentCityInput)+" "+currentDate
         document.getElementById("current-weather-div").appendChild(dateH2)
     }
 
+    //HERE, IN THE FOLLOWING FUNCTION, IS WHERE A BIG CHUNK OF THE WORK IS DONE.  BECAUSE I GOT STUCK ON ISSUES INVOLVING ASYNCHRONY, I HAD TO NEST A LOT OF CODE WITHIN THE .THEN METHODS THAT CAME AFTER THE FETCH FUNCTIONS.  
+
+
 
     function createWeatherArray(){
         weather = []
         fetch("http://api.openweathermap.org/geo/1.0/direct?q="+currentCityInput+"&limit=5&appid="+apiKay)
+        //TODO: bad response handler needs work
         .then(function (response) {
-            
+            if(!response.ok){
+                var notACityEl = document.createElement("h2")
+                notACityEl.textContent = "No Weather Data Found for This Entry"
+                document.getElementById("current-weather-div").appendChild(notACityEl)
+                
+            }
             return response.json()
         })
         .then(function(data){
@@ -72,7 +101,7 @@ $(document).ready(function(){
                 return response.json()
             })
             .then(function(data){
-   
+                //storing data for current day weather
                 localStorage.setItem("current-weather", (JSON.stringify(data)))
             
 
@@ -80,7 +109,8 @@ $(document).ready(function(){
                 if(currentDataJSON){
                     currentData = JSON.parse(currentDataJSON)
                 }
-    
+                console.log(currentData)
+                //fetching 5-day forecast
                 fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKay}`)
                     
                 .then(function (response){
@@ -88,17 +118,16 @@ $(document).ready(function(){
                 })
                 .then(function(data){
                     localStorage.setItem("weather", (JSON.stringify(data)))
-
-
-                
-
+                //storing forecast data
                 var weatherJSON = localStorage.getItem("weather")
                 if(weatherJSON){
                     forecastData = JSON.parse(weatherJSON)
                 }
 
+                //  below is where we begin extracting the data we want for each day and storing it into objects, which eventually go into the "weather" array
+
                  //============================CURRENT WEATHER==========================================
-                //OBJECT for current day
+                //OBJECT for current day 0
                 var currentDay = {}
                 //current icon              
                 var iconID = currentData.weather[0].icon
@@ -235,7 +264,7 @@ $(document).ready(function(){
 
                 }
                 function displayForecast(){
-
+                    //using a for loop to display the 5-day forcast
                     for(var i = 1; i < 6; i++){
                         var forcastDayDiv = document.createElement("div")
                         forcastDayDiv.setAttribute("id", "forecast-day-div"+i)
@@ -263,6 +292,8 @@ $(document).ready(function(){
                         document.getElementById("forecast-day-div"+i).appendChild(humidityEL)
                         }
                     }
+                    //these functions needed to be called inside the large function containing the .then statements.  This was because they would otherwise get called before
+                    //the fetch promises has fulfilled.  I believe there is another way to deal with this with other tools, such as .await(??)
                     displayForecast()
                     displayCities()
                     displayCurrentWeather()
@@ -286,17 +317,35 @@ $(document).ready(function(){
         event.preventDefault()
         clearWeatherDisplays()
         addCityToList()
+        document.getElementById("input-city").value = ""
         displayDate()
         createWeatherArray()
     })
-    //clear all button
+    //clear all cites from the list button
     document.getElementById("clear-all-button").addEventListener("click", function(event){
         event.preventDefault()
         clearCityList()
     })
-    //city list bottons
-    
+    //city list items (are made clickable with event listeners)
+    document.getElementById("city-list-div").addEventListener("click", function(event){
+        event.stopPropagation()
+        if(event.target.tagName != "BUTTON"){
+            return
+        }
+        currentCityInput = event.target.textContent
+        clearWeatherDisplays()
+        displayDate()
+        clearCityDisplay()
+        createWeatherArray()
+        
+    })
 
+    //remove city button
+    // document.getElementById("city-list-div").addEventListener("click", function(event){
+    //     event.stopPropagation()
+    //     console.log(event.target.className)
+        
+    // })
 
    // =============================Page Load===============
     displayCities()
