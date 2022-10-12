@@ -62,7 +62,7 @@ $(document).ready(function(){
         cityListDiv.innerHTML = ""
         
     }
-    //dynam
+    //dynamdynamically creating and appending cities on the left side of the screen.  They will become clickable buttons that refresh the weather display
     function displayCities(){
         cityListDiv.innerHTML = ""
         console.log(displayedCities)
@@ -74,13 +74,14 @@ $(document).ready(function(){
                 cityListDiv.appendChild(cityEL)
             }    
     }
+    //set the city list array back to empty
     function clearCityList(){
         document.getElementById("city-list-div").innerHTML = ""
-        //Document.getElementById("city-list-div").innerHTML = ""
         displayedCities = []
         localStorage.setItem("displayed-cities", JSON.stringify(displayedCities))
 
     }
+    //clear the city list display on the page
     function clearCityDisplay(){
         document.getElementById("city-list-div").innerHTML = ""
     }
@@ -95,10 +96,12 @@ $(document).ready(function(){
 
 
     function createWeatherArray(){
+        //setting the weather array to empty
         weather = []
+        //gathering longitude and latitude data to use later to get weather data
         fetch("http://api.openweathermap.org/geo/1.0/direct?q="+currentCityInput+"&limit=5&appid="+apiKay)
-        //TODO: bad response handler needs work!
         .then(function (response) {
+            //letting the user know if their entry is invalid
             if(!response.ok){
                 var notACityEl = document.createElement("h2")
                 notACityEl.textContent = "No Weather Data Found for This Entry"
@@ -122,10 +125,9 @@ $(document).ready(function(){
             var lat = data[0].lat
             var lon = data[0].lon
             //get weather info based on lat and lon
-
-            //insert current fetch call here
              fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKay}`)
             .then(function(response){
+                //double checking to make sure the entry is valid
                 if(!response.ok){
                     console.log("no current weather data")
                 }
@@ -164,7 +166,7 @@ $(document).ready(function(){
                 var iconID = currentData.weather[0].icon
                 var iconURL = "http://openweathermap.org/img/wn/"+iconID+"@2x.png"
                 currentDay.icon = iconURL
-                //current temp
+                //current temp (converting to Fahrenheit)
                 var temp = Math.floor(1.8*(currentData.main.temp-273)+32)
                 currentDay.temp = temp
                 //current wind
@@ -294,6 +296,7 @@ $(document).ready(function(){
                     document.getElementById("current-weather-div").appendChild(currentHumidityP)
 
                 }
+                //Display 5-day forecast
                 function displayForecast(){
                     //using a for loop to display the 5-day forcast
                     for(var i = 1; i < 6; i++){
@@ -324,7 +327,7 @@ $(document).ready(function(){
                         }
                     }
                     //these functions needed to be called inside the large function containing the .then statements.  This was because they would otherwise get called before
-                    //the fetch promises has fulfilled.  I believe there is another way to deal with this with other tools, such as .await(??)
+                    //the fetch promises has fulfilled.  Since writing this code, I have gone over the "async" and "await" functions.  They are a tool to more-easily manage this
                     displayForecast()
                     displayCities()
                     displayCurrentWeather()
@@ -371,16 +374,6 @@ $(document).ready(function(){
         createWeatherArray()
         
     })
-
-    //remove city button
-    // document.getElementById("city-list-div").addEventListener("click", function(event){
-    //     event.stopPropagation()
-    //     console.log(event.target.className)
-        
-    // })
-
-   // =============================Page Load===============
-   // displayCities()
 
 
 
