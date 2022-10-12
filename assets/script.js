@@ -31,7 +31,7 @@ $(document).ready(function(){
     //adds cities to an array, allowing them to be dynamically displayed
     async function addCityToList(){
         currentCityInput = document.getElementById("input-city").value
-        var goodJSON = await fetch("http://api.openweathermap.org/geo/1.0/direct?q="+currentCityInput+"&limit=5&appid="+apiKay)
+        var goodJSON = await fetch("https://api.openweathermap.org/geo/1.0/direct?q="+currentCityInput+"&limit=5&appid="+apiKay)
         var goodResponse = await goodJSON.json()
         //we only want to display the city on the dashboard if it is a valid city
         console.log(goodResponse)
@@ -99,7 +99,7 @@ $(document).ready(function(){
         //setting the weather array to empty
         weather = []
         //gathering longitude and latitude data to use later to get weather data
-        fetch("http://api.openweathermap.org/geo/1.0/direct?q="+currentCityInput+"&limit=5&appid="+apiKay)
+        fetch("https://api.openweathermap.org/geo/1.0/direct?q="+currentCityInput+"&limit=5&appid="+apiKay)
         .then(function (response) {
             //letting the user know if their entry is invalid
             if(!response.ok){
