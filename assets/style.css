@@ -45,6 +45,7 @@ button{
     display: block;
 }
 #current-weather-div{
+    padding: 5px;
     border: 2px solid black;
     height: 288.36px;
     margin: 10px;

@@ -269,7 +269,6 @@ $(document).ready(function(){
                     currentIconImage.setAttribute("src", weather[0].icon)
                     document.getElementById("current-weather-div").appendChild(currentIconImage)
 
-
                     var currentTempP = document.createElement("p")
                     currentTempP.textContent = "Temperature: "+weather[0].temp+"(f)"
                     //currentTempP.style.fontSize = "20px"
