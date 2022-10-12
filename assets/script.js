@@ -9,7 +9,7 @@ $(document).ready(function(){
     var cityListDiv = document.getElementById("city-list-div")
     //imprtant variable.  It is always used as the current city that we are displaying
     var currentCityInput
-    var displayedCities = JSON.parse(localStorage.getItem("displayed-cities"))
+    var displayedCities =[] //JSON.parse(localStorage.getItem("displayed-cities"))
     var currentDate = moment().format("MM/D/YYYY")
     //ar currentDate = moment().add(4, "day").format("MM/D/YYYY")
 
@@ -17,10 +17,9 @@ $(document).ready(function(){
     var weather = []
     var currentData
     var forecastData
+
     //initializing the list of previous cities
-    if(displayedCities ==null){
-        displayedCities = []
-    }
+    
   
     //Function declarations begin here.  
 
@@ -29,32 +28,51 @@ $(document).ready(function(){
         document.getElementById("forecast-div").innerHTML = ""
 
     }
-    function addCityToList(){
-
+    //adds cities to an array, allowing them to be dynamically displayed
+    async function addCityToList(){
         currentCityInput = document.getElementById("input-city").value
+        var goodJSON = await fetch("http://api.openweathermap.org/geo/1.0/direct?q="+currentCityInput+"&limit=5&appid="+apiKay)
+        var goodResponse = await goodJSON.json()
+        //we only want to display the city on the dashboard if it is a valid city
+        console.log(goodResponse)
+        if(goodResponse.length <1){
+            return
+        }
+        
         if(currentCityInput == ""){
+
             cityListDiv.innerHTML = ""
             return
         }
+        //we dont want repeat cities to be displayed
         if(displayedCities.includes(currentCityInput)){
+  
             return
         }
-        displayedCities.push(currentCityInput)
-        localStorage.setItem("displayed-cities", JSON.stringify(displayedCities))
-        cityListDiv.innerHTML = ""
-    }
-    function displayCities(){
-        for(var i = 0;i<displayedCities.length;i++){
-            var city = document.createElement ("button")
-            city.setAttribute("class", "city")
-            city.innerHTML = displayedCities[i]
-            cityListDiv.appendChild(city)
-
-            // var deleteCityButton = document.createElement("button")
-            // deleteCityButton.setAttribute("class", "delete-button")
-            // deleteCityButton.textContent = "Remove City"
-            // city.appendChild(deleteCityButton)
+        var pastSearch = JSON.parse(localStorage.getItem("displayed-cities"))
+        if(pastSearch){
+            for(var i = 0; i <pastSearch.length; i++){
+                displayedCities.push(pastSearch[i])
+            }
+            
         }
+        displayedCities.push(currentCityInput)
+    
+        //localStorage.setItem("displayed-cities", JSON.stringify(displayedCities))
+        cityListDiv.innerHTML = ""
+        
+    }
+    //dynam
+    function displayCities(){
+        cityListDiv.innerHTML = ""
+        console.log(displayedCities)
+            for(var i = 0; i < displayedCities.length; i++){
+                var city = displayedCities[i]
+                var cityEL = document.createElement("button")
+                cityEL.setAttribute("class", "city")
+                cityEL.innerHTML = city
+                cityListDiv.appendChild(cityEL)
+            }    
     }
     function clearCityList(){
         document.getElementById("city-list-div").innerHTML = ""
@@ -84,13 +102,23 @@ $(document).ready(function(){
             if(!response.ok){
                 var notACityEl = document.createElement("h2")
                 notACityEl.textContent = "No Weather Data Found for This Entry"
-                document.getElementById("current-weather-div").appendChild(notACityEl)
+                //document.getElementById("current-weather-div").appendChild(notACityEl)
+                
                 
             }
+
             return response.json()
         })
         .then(function(data){
             //get latitude and longitude from geo
+            if(data[0]==undefined){
+                console.log("lat undefined")
+                var notACityEl = document.createElement("h2")
+                notACityEl.textContent = "No Weather Data Found for This Entry"
+                document.getElementById("current-weather-div").appendChild(notACityEl)
+                currentCityInput = ""
+                return
+            }
             var lat = data[0].lat
             var lon = data[0].lon
             //get weather info based on lat and lon
@@ -98,6 +126,9 @@ $(document).ready(function(){
             //insert current fetch call here
              fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKay}`)
             .then(function(response){
+                if(!response.ok){
+                    console.log("no current weather data")
+                }
                 return response.json()
             })
             .then(function(data){
@@ -109,7 +140,7 @@ $(document).ready(function(){
                 if(currentDataJSON){
                     currentData = JSON.parse(currentDataJSON)
                 }
-                console.log(currentData)
+
                 //fetching 5-day forecast
                 fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKay}`)
                     
@@ -318,8 +349,9 @@ $(document).ready(function(){
         clearWeatherDisplays()
         addCityToList()
         document.getElementById("input-city").value = ""
-        displayDate()
+
         createWeatherArray()
+        displayDate()
     })
     //clear all cites from the list button
     document.getElementById("clear-all-button").addEventListener("click", function(event){
@@ -348,7 +380,7 @@ $(document).ready(function(){
     // })
 
    // =============================Page Load===============
-    displayCities()
+   // displayCities()
 
 
 

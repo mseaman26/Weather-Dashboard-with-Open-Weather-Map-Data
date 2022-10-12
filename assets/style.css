@@ -4,6 +4,8 @@ header{
     color: white;
     text-align: center;
     font-size: 40px;
+    position: sticky;
+    top: 0px;
 }
 main{
     display: flex;
@@ -54,16 +56,19 @@ button{
 
 #forecast-div{
     display: flex;
-   
+    flex-wrap: wrap;
     justify-content: space-evenly;
 }
 .forecast-day-div{
+    
     height: 288px;
     width: 250px;
     border: 2px solid black;
     margin: 10px;
     background-color: rgb(48, 48, 97);
     color: white;
+    border-radius: 10px;
+    padding: 5px;
 }
 
 @media screen and (max-width: 992px) {
