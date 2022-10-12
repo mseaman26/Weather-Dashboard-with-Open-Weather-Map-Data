@@ -34,7 +34,6 @@ $(document).ready(function(){
         var goodJSON = await fetch("https://api.openweathermap.org/geo/1.0/direct?q="+currentCityInput+"&limit=5&appid="+apiKay)
         var goodResponse = await goodJSON.json()
         //we only want to display the city on the dashboard if it is a valid city
-        console.log(goodResponse)
         if(goodResponse.length <1){
             return
         }
@@ -65,7 +64,6 @@ $(document).ready(function(){
     //dynamdynamically creating and appending cities on the left side of the screen.  They will become clickable buttons that refresh the weather display
     function displayCities(){
         cityListDiv.innerHTML = ""
-        console.log(displayedCities)
             for(var i = 0; i < displayedCities.length; i++){
                 var city = displayedCities[i]
                 var cityEL = document.createElement("button")
@@ -106,16 +104,12 @@ $(document).ready(function(){
                 var notACityEl = document.createElement("h2")
                 notACityEl.textContent = "No Weather Data Found for This Entry"
                 //document.getElementById("current-weather-div").appendChild(notACityEl)
-                
-                
             }
-
             return response.json()
         })
         .then(function(data){
             //get latitude and longitude from geo
             if(data[0]==undefined){
-                console.log("lat undefined")
                 var notACityEl = document.createElement("h2")
                 notACityEl.textContent = "No Weather Data Found for This Entry"
                 document.getElementById("current-weather-div").appendChild(notACityEl)
@@ -129,7 +123,6 @@ $(document).ready(function(){
             .then(function(response){
                 //double checking to make sure the entry is valid
                 if(!response.ok){
-                    console.log("no current weather data")
                 }
                 return response.json()
             })
